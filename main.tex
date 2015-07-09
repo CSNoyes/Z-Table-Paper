@@ -5,8 +5,8 @@
 \usepackage{amsmath}
 \usepackage{pgfplots}
 
-\usepackage{cite}
-
+\usepackage[backend=biber]{biblatex}
+\addbibresource{ZTree.bib}
 
 \title{The Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Systems}
 
@@ -22,7 +22,7 @@ We present the design and implementation of a novel data structure (the 'Z-Table
 
 \newpage
 \section{Introduction}
-Distributed hash tables are currently one of the hottest topics in the cryptography space~\cite{Stoica:2001dj,Rowstron:2001ea,Ratnasamy:2001wn}
+Distributed hash tables are currently one of the hottest topics in the cryptography space~\cite{Stoica:2001dj,Rowstron:2001ea,Ratnasamy:2001wn}. They are used in many large scale open sources projects~\cite{Freitas:2013tb,Xu:2010vs,Perfitt:2010fh} as the underlying infastructure.
 
 \printbibliography
 \end{document}
