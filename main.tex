@@ -4,6 +4,11 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{breakurl}
+\usepackage{indentfirst}
+\usepackage{authblk}
+\usepackage{todonotes}
 
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
@@ -16,13 +21,26 @@
 \maketitle
 
 \begin{abstract}
-We present the design and implementation of a novel data structure (the 'Z-Table'). We aim to solve the issue of window/range-based queries in peer to peer architectures. Traditional models, for example,  distributed hash tables (DHT), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined keyspace; the hashing operations used to achieve this pseudo-random distribution inherently erases all characteristics of the target data that could be used to define locality. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional keyspace, while preserving locality. The resulting keyspace is very definitely not uniformly distributed, so we define a distributed consensus scheme in which participants in our Z-Tables agree to target highly populated regions of the keyspace. This consensus scheme also provides some protection from Sybil attacks. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions; the preservation of locality allows us to greatly optimize these operations through the use of balanced trees. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture (fault tolerance, scalability, and truly independent operation).
+We present the design and implementation of a novel data structure (the 'Z-Table'). We aim to solve the issue of window/range-based queries in peer to peer architectures. Traditional models, for example,  distributed hash tables (DHT), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this pseudo-random distribution inherently erases all characteristics of the target data that could be used to define locality. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting keys pace is very definitely not uniformly distributed, so we define a distributed consensus scheme in which participants in our Z-Tables agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions; the preservation of locality allows us to greatly optimize these operations through the use of balanced trees. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture (fault tolerance, scalability, and truly independent operation).
 \end{abstract}
 
+\section{Notation}
 
-\newpage
+Tuples (concatenation): $[a,b,c,...]$
+
+Application of a function $f$ to an input $x$: $y=f(x)$
+
+Application of a hash function $H$ with $k$ output bits: $H_{k}(x) = \{0,1\}^k$
+
+Keys of user $j$: $ PUBK_j; PRIVK_j $
+
+Note: $PUBK(PRIVK(x)) = x$ and $PRIVK(PUBK(y)) = y$~\todo{citation}
+
+Signed content $x$ from user $j$: $SIG_j(x) = \left[ PRIVK_j( H(x) ), x \right]$
+
 \section{Introduction}
-Distributed hash tables are currently one of the hottest topics in the cryptography space~\cite{Stoica:2001dj,Rowstron:2001ea,Ratnasamy:2001wn}. They are used in many large scale open sources projects~\cite{Freitas:2013tb,Xu:2010vs,Perfitt:2010fh} as the underlying infastructure.
+\par Distributed hash tables are currently one of the hottest topics in the cryptography space~\cite{Stoica:2001dj,Rowstron:2001ea,Ratnasamy:2001wn}. They are used in many large scale open sources projects~\cite{Freitas:2013tb,Xu:2010vs,Perfitt:2010fh} as their underlying infrastructure. First, in order to better understand the motivation behind this project, a brief explanation of the workings of a distributed has table (DHT) and its constituent protocols is needed.
 
+\par Simply put, DHT's were created to provide hash table-like functionality on an Internet-scale level~\cite{Ratnasamy:2001wn}. They expose basic PUT and GET requests (operating on (key,value) pairs) to clients, allowing them to store and retrieve information from the DHT. The difference between a hash table and a DHT is the scope of the mechanism: DHT's are able to operate in an entirely decentralized setting, in which the responsibility for the mapping of keys to values is distributed pseudo-uniformly among all participants in a P2P network.
 \printbibliography
 \end{document}
