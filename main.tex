@@ -9,11 +9,12 @@
 \usepackage{indentfirst}
 \usepackage{authblk}
 \usepackage{todonotes}
+\usepackage[doublespacing]{setspace}
 
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
 
-\title{The Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Systems}
+\title{Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Systems}
 
 
 \begin{document}
@@ -41,6 +42,17 @@ Signed content $x$ from user $j$: $SIG_j(x) = \left[ PRIVK_j( H(x) ), x \right]$
 \section{Introduction}
 \par Distributed hash tables are currently one of the hottest topics in the cryptography space~\cite{Stoica:2001dj,Rowstron:2001ea,Ratnasamy:2001wn}. They are used in many large scale open sources projects~\cite{Freitas:2013tb,Xu:2010vs,Perfitt:2010fh} as their underlying infrastructure. First, in order to better understand the motivation behind this project, a brief explanation of the workings of a distributed has table (DHT) and its constituent protocols is needed.
 
-\par Simply put, DHT's were created to provide hash table-like functionality on an Internet-scale level~\cite{Ratnasamy:2001wn}. They expose basic PUT and GET requests (operating on (key,value) pairs) to clients, allowing them to store and retrieve information from the DHT. The difference between a hash table and a DHT is the scope of the mechanism: DHT's are able to operate in an entirely decentralized setting, in which the responsibility for the mapping of keys to values is distributed pseudo-uniformly among all participants in a P2P network.
+\par Simply put, DHTs were created to provide hash table-like functionality on an Internet-scale level~\cite{Ratnasamy:2001wn}. They expose basic PUT and GET requests (operating on (key,value) pairs) to clients, allowing them to store and retrieve information from the DHT. The difference between a hash table and a DHT is the scope of the mechanism: DHTs are able to operate in an entirely decentralized setting, in which the responsibility for the mapping of keys to values is distributed pseudo-uniformly among all participants in a P2P network. Notable networks that utilize DHTs include the Coral Content Distribution Network~\cite{Freedman:2004vb}, the Storm Botnet~\cite{Holz:2008uk}, and the BitTorrent file sharing protocol~\cite{Cohen:y1_8mBnw}.
+
+\par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's keyspace~\todo{citation}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the keyspace. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their being 'hotspots' in the keyspace.~\todo{citations?}
+
+\par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow 'close' to one another) precludes the possibility of range or window-based queries.
+
+\par To illustrate this concept of locality, take the two pairs of numbers $(1,2)$ and $(8,10)$. We can intuitively tell that the $(1,2)$ is a 'close' pair; mathematically, we could say that this distance is the difference of the two numbers, $1$. The second pair is both 'far' from $(1,2)$ individually farther apart. Generically, we can say that locality is preserved for any given set of objects (serializable to a numeric representation in some fashion) $A,B$ and $C$ in a function $f$ such that
+
+\begin{equation}
+|A-B| < |B-C| \Rightarrow |f(A)-f(B)| < |f(B) - f(C)|
+\end{equation}
+
 \printbibliography
 \end{document}
