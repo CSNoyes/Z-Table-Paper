@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage[utf8]{inputenc}
+\renewcommand\rmdefault{phv}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -10,24 +10,27 @@
 \usepackage{authblk}
 \usepackage{todonotes}
 \usepackage[doublespacing]{setspace}
+\usepackage[margin=1in]{geometry}
 
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
 
-\title{Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Systems}
-
+\title{Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Sensornets}
+\author{Siemen's Competition 2015}
+\date{\vspace{-5ex}}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We present the design and implementation of a novel data structure (the 'Z-Table'). We aim to solve the issue of window/range-based queries in peer to peer architectures. Traditional models, for example,  distributed hash tables (DHT), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this pseudo-random distribution inherently erases all characteristics of the target data that could be used to define locality. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting keys pace is very definitely not uniformly distributed, so we define a distributed consensus scheme in which participants in our Z-Tables agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions; the preservation of locality allows us to greatly optimize these operations through the use of balanced trees. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture (fault tolerance, scalability, and truly independent operation).
+We present the design and implementation of a novel data structure (the 'Z-Table'). We aim to solve the issue of window/range-based queries in peer to peer architectures. Traditional models, for example,  distributed hash tables (DHT), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this pseudo-random distribution inherently erases all characteristics of the target data that could be used to define locality. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting keys pace is very definitely not uniformly distributed, so we define a distributed consensus scheme in which participants in our Z-Tables agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions; the preservation of locality allows us to greatly optimize these operations through the use of balanced trees. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture (scalability, robustness, etc.).
 \end{abstract}
+
 
 \section{Notation}
 
-Tuples (concatenation): $[a,b,c,...]$
+Tuples/Lists: $[a,b,c,...]$
 
 Application of a function $f$ to an input $x$: $y=f(x)$
 
@@ -44,15 +47,16 @@ Signed content $x$ from user $j$: $SIG_j(x) = \left[ PRIVK_j( H(x) ), x \right]$
 
 \par Simply put, DHTs were created to provide hash table-like functionality on an Internet-scale level~\cite{Ratnasamy:2001wn}. They expose basic PUT and GET requests (operating on (key,value) pairs) to clients, allowing them to store and retrieve information from the DHT. The difference between a hash table and a DHT is the scope of the mechanism: DHTs are able to operate in an entirely decentralized setting, in which the responsibility for the mapping of keys to values is distributed pseudo-uniformly among all participants in a P2P network. Notable networks that utilize DHTs include the Coral Content Distribution Network~\cite{Freedman:2004vb}, the Storm Botnet~\cite{Holz:2008uk}, and the BitTorrent file sharing protocol~\cite{Cohen:y1_8mBnw}.
 
-\par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's keyspace~\todo{citation}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the keyspace. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their being 'hotspots' in the keyspace.~\todo{citations?}
+\par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's keyspace~\todo{citation}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the keyspace. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their residing in some supposed 'hotspots' in the keyspace, in which a disproportionally high number of objects are stored.~\todo{citations?}
 
-\par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow 'close' to one another) precludes the possibility of range or window-based queries.
-
-\par To illustrate this concept of locality, take the two pairs of numbers $(1,2)$ and $(8,10)$. We can intuitively tell that the $(1,2)$ is a 'close' pair; mathematically, we could say that this distance is the difference of the two numbers, $1$. The second pair is both 'far' from $(1,2)$ individually farther apart. Generically, we can say that locality is preserved for any given set of objects (serializable to a numeric representation in some fashion) $A,B$ and $C$ in a function $f$ such that
-
+\par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow as 'distant' from one another as the objects themselves) precludes the possibility of range or window-based queries. Intuitively, we can say that locality is preserved for any given set of objects (serializable to a numeric representation in some fashion) $A,B,$ and $C$ in a function $f$ such that
 \begin{equation}
-|A-B| < |B-C| \Rightarrow |f(A)-f(B)| < |f(B) - f(C)|
+|A-B| < |B-C| \Rightarrow |f(A)-f(B)| < |f(B) - f(C)|,
 \end{equation}
+and garden variety hash functions obviously do not fulfill this requirement.
 
+\par Some research has been done on the usage of a DHT as an overlay 
+
+\newpage
 \printbibliography
 \end{document}
