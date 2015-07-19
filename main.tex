@@ -19,7 +19,7 @@
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
 
-\title{Z-Table: A Novel Range-Queryable Distributed Data Structure for Use in P2P Sensornets}
+\title{Work in Progress: A Novel Range-Queryable Distributed Data Structure}
 \author{Siemen's Competition 2015}
 \date{\vspace{-5ex}}
 
@@ -55,16 +55,16 @@ We present the design and implementation of a novel data structure (the 'Z-Table
 
 
 The idea of locality vs. evenness is fundamental to our work, and so we define it here. Intuitively, we can say that locality is preserved for any given set of objects (serializable to a numeric representation in some fashion) $A,B,$ and $C$ in a function $f$ such that
-\begin{equation}
+\begin{equation} \label{eq:locality}
 |A-B| < |B-C| \Rightarrow |f(A)-f(B)| < |f(B) - f(C)|,
 \end{equation}
 and garden variety hash functions obviously do not fulfill this requirement.
 
-\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries\todo{cite skiptree and DST}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\todo{cite}, with a litany of papers having been published on this attack in the context of DHTs~\todo{cite}, and yet the subject is not even broached.
+\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries\todo{cite skiptree and DST}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\todo{cite}, with a litany of papers having been published on this attack in the context of DHTs~\todo{cite}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
 
-\par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purpose.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas.
+\par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purpose.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas. This is a necessity because of load balancing concerns in the context of the possibility of the defined Sybil attacks.
 
-\par A DHT that satisfies all of these requirements would be extremely helpful to users in a variety of settings. Sensornets have been the darling of the P2P research and usage communities for some time now, and we believe that our data structure could allow for distributed sensornets in which both the collection \textit{and} the lookup/analysis processes are decentralized. To be clear, no other data structure in existence has these capabilities. In fact, this work is the direct result of an inability to find an existing solution. Some potential applications include:
+\par A DHT that satisfies all of these requirements would be extremely helpful to users in a variety of settings. To be clear, no other data structure in existence has these capabilities. In fact, this work is the direct result of an inability to find an existing solution. Some potential applications include:
 
 
 
@@ -78,8 +78,17 @@ and garden variety hash functions obviously do not fulfill this requirement.
 
 \par We believe that the best solution is one in which we only slightly modify the way in which a DHT works. Substituting a space filling curve for a hash function would allow us to preserve locality of data in a DHT with rigorously defined limitations on what kind of data may be stored in it.
 
-\par Currently, we believe that bit interleaving is a promising replacement for hash functions.
+\par Currently, we believe that bit interleaving is a promising replacement for hash functions. Through the use of space filling curves, such as a Z-Order curve (sometimes called the Morton curve), $Nth$-dimensional data can be mapped to the first dimension (such that it may be stored in-memory). The mapping of a section of the integral Cartesian plane to binary, through the interleaving of the $x$ and $y$ coordinates, is illustrated in Fig.~\ref{fig_ZOrd}.
 
+\par Interestingly, the interleaving of bits to form Morton codes preserves the locality of the initial data in the output, satisfying Eq.~\ref{eq:locality}. There is, however, no currently agreed upon scheme for the extension of this function to floating point numbers. A few solutions have been proposed
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{errors.eps}
+\caption{Bit Interleaving With A Z Order Curve}
+\label{fig_ZOrd}
+\end{figure}
 
 
 \printbibliography
