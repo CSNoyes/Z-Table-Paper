@@ -14,7 +14,11 @@
 \usepackage{authblk}
 \usepackage{todonotes}
 \usepackage{svg}
-
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand*\Append[2]{\State #1$.append($#2$)$}
 
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
@@ -72,23 +76,56 @@ and garden variety hash functions obviously do not fulfill this requirement.
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3in]{ZCurve}
-\caption{Bit Interleaving With A Z Order Curve}
-\label{fig_ZOrd}
+\caption{Morton Codes/Z-Order Curving}
+\label{fig_MCode}
 \end{figure}
 
 \par We believe that the best solution is one in which we only slightly modify the way in which a DHT works. Substituting a space filling curve for a hash function would allow us to preserve locality of data in a DHT with rigorously defined limitations on what kind of data may be stored in it.
 
-\par Currently, we believe that bit interleaving is a promising replacement for hash functions. Through the use of space filling curves, such as a Z-Order curve (sometimes called the Morton curve), $Nth$-dimensional data can be mapped to the first dimension (such that it may be stored in-memory). The mapping of a section of the integral Cartesian plane to binary, through the interleaving of the $x$ and $y$ coordinates, is illustrated in Fig.~\ref{fig_ZOrd}.
+\par Currently, we believe that bit interleaving is a promising replacement for hash functions. Through the use of space filling curves, such as a Z-Order curve (sometimes called the Morton curve), $Nth$-dimensional data can be mapped to the first dimension (such that it may be stored in-memory). The mapping of a section of the integral Cartesian plane to binary, through the interleaving of the $x$ and $y$ coordinates, is illustrated in Fig.~\ref{fig_MCode}.
 
-\par Interestingly, the interleaving of bits to form Morton codes preserves the locality of the initial data in the output, satisfying Eq.~\ref{eq:locality}. There is, however, no currently agreed upon scheme for the extension of this function to floating point numbers. A few solutions have been proposed
+\par Interestingly, the interleaving of bits to form Morton codes preserves the locality of the initial data in the output, satisfying Eq.~\ref{eq:locality}. There is, however, no currently agreed upon scheme for the extension of this function to floating point numbers. A few solutions have been proposed, such as~\cite{Connor:2010eq}, but none have been truly validated. We do not believe this to be a significant obstacle, and even an imperfect solution can work the time being.
 
+\par For now, we are using longitudinal and latitudinal coordinates to test range based searches in a sorted key-value database. Our algorithm to serialize the decimal coordinates to bytes is as follows, where $lat$ and $lon$ are the inputs and $ZOrd$ is a bit interleaving function:
+
+\begin{equation} \label{eq:serialization}
+ZOrd(int((lat + 90) * 100), int((lon + 180) * 100))
+\end{equation}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{errors.eps}
+\includegraphics[width=3.5in]{errors.eps}
 \caption{Bit Interleaving With A Z Order Curve}
 \label{fig_ZOrd}
 \end{figure}
+
+\par Obviously this is an imperfect solution, however the number of errors in a real-world test of this algorithm showed that the error rate is fairly negligible. The following algorithm describes our testing scheme.
+\begin{algorithm}
+  \begin{algorithmic}[1]
+    \Require{$x$ and $y$ are packed strings of equal length $n$}
+    \Statex
+    \Function{Test}{$n,min/maxLat,min/maxLon$}
+    \Let{$storageDic$}{$\{\}$}
+    \Let{$correctResults$}{$[]$}
+        \For{$i \textrm{ in Range}(n)$}
+            \Let{$lat$}{$\textrm{RandFloat(-90,90)}$}
+            \Let{$lon$}{$\textrm{RandFloat(-180,180)}$}
+            \Let{$key$}{$Eq.$~\ref{eq:serialization}$(lat,lon)$}
+            \Let{$storageDic[key]$}{$i$}
+            \If{$(minLat<lat<maxLat)\&\&$ \par 
+            \hskip\algorithmicindent$(minLon<Lon<maxLon)$}
+                \Append{$correctResults$}{$i$}
+            \EndIf
+        \EndFor
+        \Let{$minRangeCode$}{$Eq.~\ref{eq:serialization}(minLat,minLon)$}
+        \Let{$maxRangeCode$}{$Eq.~\ref{eq:serialization}(maxLat,maxLon)$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+Our results are shown in Fig.~\ref{fig_ZOrd}. We are confident that this decimal flooring scheme will effectively bridge the gap of time between the work we are doing here and the validation of a floating point-ready Z-Ordering scheme.
+
+
+
 
 
 \printbibliography
