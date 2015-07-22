@@ -1,4 +1,4 @@
-\documentclass[12pt]{IEEEtran}
+\documentclass[10pt]{IEEEtran}
 \usepackage[T1]{fontenc}
 %\documentclass[12pt]{Article}
 %\renewcommand\rmdefault{phv}
@@ -32,7 +32,7 @@
 \maketitle
 
 \begin{abstract}
-We present the design and implementation of a novel data structure (the 'Z-Table'). We aim to solve the issue of window/range-based queries in peer to peer architectures. Traditional models, for example,  distributed hash tables (DHT), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this deterministically pseudo-random key distribution inherently erases all characteristics of the target data that could be used to classify it. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting keys pace is very definitely not uniformly distributed, so we define a distributed consensus scheme in which participants in our Z-Tables agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks, as it is based off a hashcash-like proof of work system. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture (scalability, robustness, etc.).
+We present the design of a novel data structure. We aim to solve the issue of window/range-based queries of distributed data stores in peer to peer architectures. Traditional models, for example, distributed hash tables (DHTs), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this even key distribution inherently erases all characteristics of the target data that could be used to classify it. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting key space is not uniformly distributed, so we define a distributed consensus protocol in which participants in our network agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks, as it is a to hash-based proof of work system. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture.
 \end{abstract}
 
 
@@ -54,7 +54,7 @@ We present the design and implementation of a novel data structure (the 'Z-Table
 
 \par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's key space~\todo{citation}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the key space. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their residing in some supposed 'hotspots' in the key space, in which a disproportionally high number of objects are stored.~\todo{citations?}
 
-\par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow as 'distant' from one another as the objects themselves) precludes the possibility of range or window-based queries. Ramabhadran et al. put it very well: \textit{"However, range queries, asking for all objects with values in a certain range, are particularly difficult to implement in DHTs. This is because DHTs use hashing to distribute keys uniformly and so can't rely on any structural properties of the key space, such as an ordering among keys.~\cite"
+\par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow as 'distant' from one another as the objects themselves) precludes the possibility of range or window-based queries. Ramabhadran et al. put it very well: \textit{"However, range queries, asking for all objects with values in a certain range, are particularly difficult to implement in DHTs. This is because DHTs use hashing to distribute keys uniformly and so can't rely on any structural properties of the key space, such as an ordering among keys"}~\cite{Ramabhadran:2004tr}\textit{.}
 
 
 
@@ -64,9 +64,9 @@ The idea of locality vs. evenness is fundamental to our work, and so we define i
 \end{equation}
 and garden variety hash functions obviously do not fulfill this requirement.
 
-\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries\todo{cite skiptree and DST}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\todo{cite}, with a litany of papers having been published on this attack in the context of DHTs~\todo{cite}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
+\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries~\cite{}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\todo{cite}, with a litany of papers having been published on this attack in the context of DHTs~\todo{cite}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
 
-\par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purpose.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas. This is a necessity because of load balancing concerns in the context of the possibility of the defined Sybil attacks.
+\par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions (LSHs) do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purposes. LSHs are generally useful only in an extremely narrow set of cases.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas. This is a necessity because of load balancing concerns in the context of the possibility of the defined Sybil attacks.
 
 \par A DHT that satisfies all of these requirements would be extremely helpful to users in a variety of settings. To be clear, no other data structure in existence has these capabilities. In fact, this work is the direct result of an inability to find an existing solution. Some potential applications include:
 
@@ -95,11 +95,11 @@ ZOrd(int((lat + 90) * 100), int((lon + 180) * 100))
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3.5in]{errors.eps}
-\caption{Bit Interleaving With A Z Order Curve}
+\caption{Bit Interleaving With A Z-Order Curve}
 \label{fig_ZOrd}
 \end{figure}
 
-\par Obviously this is an imperfect solution, however the number of errors in a real-world test of this algorithm showed that the error rate is fairly negligible. The following algorithm describes our testing scheme.
+\par Obviously this is an imperfect solution, however the number of errors in a real-world test of this algorithm showed that the error rate is fairly negligible. The following algorithm describes our testing methodology.
 \begin{algorithm}
   \begin{algorithmic}[1]
   \Require{A '/' denotes two variables with different prefixes, and is used to save line space.}
@@ -134,9 +134,37 @@ ZOrd(int((lat + 90) * 100), int((lon + 180) * 100))
 
 \par Our results are shown in Fig.~\ref{fig_ZOrd}. We are confident that this decimal flooring scheme will effectively bridge the gap of time between the work we are doing here and the validation of a floating point-ready Z-Ordering scheme.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3.5in]{finalRing}
+\caption{Evenly Distributed Key Space Mapping}
+\label{fig_kSpace}
+\end{figure}
+
+\par Finally, we come to the problem of key space distribution. Illustrated in Fig.~\ref{fig_kSpace} is the way in which we transform the linear version of the key space into a circular representation, and how the nodes communicate with their 'neighbors' in a DHT. On one 'end' of the linear representation is the lowest possible value (in binary, this would be the set $\{0\}^k$), and on the other is the maximum possible value ($\{1\}^k$). Notice that in both representations, the nodes are distributed evenly. Each occupies the same amount of space as the others, and together they cover the entire key space. We don't even need to populate the key space with examples, as we can prove that they will cover it evenly when using a 'good' hash function as the key function.
+
+\par If we were to use our Z-Ordering scheme as the key space location function, we will almost certainly have the data become 'clustered' in some sense. For example, if we were to store all of the data about the global land-line network, we would most likely have all of the data from highly populated areas focused on a few regions in the key space, and oceans of nothingness between them. This is an unavoidable byproduct of the use of a locality-preserving function.
 
 
 
+\par Fig.~\ref{fig_kSpaceUneven} shows a distributed data structure in which a locality preserving function was used, and the populated areas of the key space are highlighted in red. Notice that two of the nodes are doing all of the work, while the others have no load to bear. There is no existing mechanism for nodes to retroactively redistribute themselves.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3.5in]{unevenDistro}
+\caption{Node Convergence}
+\label{fig_kSpaceUneven}
+\end{figure}
+
+\par We propose the inclusion of cryptographic proof of work, ala Hashcash\cite{Back:2002vq}, with each stored piece of data. Because these proofs are difficult to compute, no entity can easily execute a Sybil-like attack against the rest of the network by including 'junk' proofs; everyone else would simply be able to see that the proofs are incorrect. A user $j$ would send this to the rest of the network:
+
+\begin{equation} \label{eq:proof}
+SerializedData = [PrivK_{j}((H(Data)), Data, PubK_{j}]
+\end{equation}
+
+\par When the nodes in a network wish to reconfigure themselves, all nodes are instructed to report all of the proof of work they know about. All of the nodes then independently construct a curve of the key space population and attempt to converge on this region. Given that there will always be a global maxima, this is relatively trivial. The actual methodology of this convergence is the core focus of our ongoing research. Currently, we are exploring the possibility of using the derivative of the fitted curve to calculate optimal node spacing.
+
+\par From a game theory perspective, the proof of work system is greatly beneficial. Sybil attacks are largely mitigated, and there is no obvious advantage for a malicious node to withhold its knowledge of the proofs in its region. This does, however, introduce some amount of overheard into the network. We believe that this is not a terribly inhibiting factor, as the use cases for a decentralized (i.e. public) version of our data structure are almost always either altruistic or capitalistic in nature. To give an example of the former, folding@Home~\todo{cite}, a network in which people donate unused computational resources to fold proteins, has been wildly successful. Bitcoin~\todo{cite}, the decentralized P2P cryptocurrency network, is an excellent example of hashing power being used for the latter case. In both networks, there is no lack of available resources.
 
 \printbibliography
 \end{document}
