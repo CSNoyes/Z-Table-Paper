@@ -24,7 +24,7 @@
 \addbibresource{ZTree.bib}
 
 \title{Work in Progress: A Novel Range-Queryable Distributed Data Structure}
-\author{Siemen's Competition 2015}
+\author{Charles Noyes}
 \date{\vspace{-5ex}}
 
 \begin{document}
@@ -52,7 +52,7 @@ We present the design of a novel data structure. We aim to solve the issue of wi
 
 \par Simply put, DHTs were created to provide hash table-like functionality on an Internet-scale level~\cite{Ratnasamy:2001wn}. They expose basic PUT and GET requests (operating on (key,value) pairs) to clients, allowing them to store and retrieve information from the DHT. The difference between a hash table and a DHT is the scope of the mechanism: DHTs are able to operate in an entirely decentralized setting, in which the responsibility for the mapping of keys to values is distributed pseudo-uniformly among all participants in a P2P network. Notable networks that utilize DHTs include the Coral Content Distribution Network~\cite{Freedman:2004vb}, the Storm Botnet~\cite{Holz:2008uk}, and the BitTorrent file sharing protocol~\cite{Cohen:y1_8mBnw}.
 
-\par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's key space~\todo{citation}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the key space. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their residing in some supposed 'hotspots' in the key space, in which a disproportionally high number of objects are stored.~\todo{citations?}
+\par Keys used in traditional DHTs are calculated through the use of a hash function. Given that the digest (output) of a hash function is some number of bits, each of which has the same probability of being set to $'1'$ or $'0'$, we can confidently conclude that the outputs will be randomly distributed along the hash function's key space~\cite{Stoica:2001dj}. This keyspace is the set of all possible outputs; for a hash function with $k$ output bits, this is the set $\{0,1\}^k$. This is useful to users in a DHT because, assuming that a given hash function is 'sound,' in that its outputs are actually evenly distributed, they are able to mathematically verify the even partitioning of the key space. The participants can thus trust that the load will be balanced fairly among all nodes. No one node will have complete control, and no group of nodes will be unfairly burdened due to their residing in some supposed 'hotspots' in the key space, in which a disproportionally high number of objects are stored.
 
 \par One important continuity between all of these examples is the use of a DHT in an 'exact-match' lookup scenario; the even distribution of hash functions once again comes into play. The purging of any locality (that is, the property of alike object's digests being somehow as 'distant' from one another as the objects themselves) precludes the possibility of range or window-based queries. Ramabhadran et al. put it very well: \textit{"However, range queries, asking for all objects with values in a certain range, are particularly difficult to implement in DHTs. This is because DHTs use hashing to distribute keys uniformly and so can't rely on any structural properties of the key space, such as an ordering among keys"}~\cite{Ramabhadran:2004tr}\textit{.}
 
@@ -64,7 +64,7 @@ The idea of locality vs. evenness is fundamental to our work, and so we define i
 \end{equation}
 and garden variety hash functions obviously do not fulfill this requirement.
 
-\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries~\cite{Ramabhadran:2004tr,Desnoyers:2008uo}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\todo{cite}, with a litany of papers having been published on this attack in the context of DHTs~\todo{cite}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
+\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries~\cite{Ramabhadran:2004tr,Desnoyers:2008uo}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\cite{Douceur:2002jr}, with a litany of papers having been published on this attack in the context of DHTs~\cite{LesniewskiLass:2010ue}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
 
 \par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions (LSHs) do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purposes. LSHs are generally useful only in an extremely narrow set of cases.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas. This is a necessity because of load balancing concerns in the context of the possibility of the defined Sybil attacks.
 
@@ -76,7 +76,7 @@ and garden variety hash functions obviously do not fulfill this requirement.
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3in]{ZCurve}
-\caption{Morton Codes/Z-Order Curving}
+\caption{Morton Codes/Z-Order Curving~\cite}
 \label{fig_MCode}
 \end{figure}
 
