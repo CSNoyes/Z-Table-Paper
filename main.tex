@@ -29,7 +29,7 @@
 \usepackage[backend=biber]{biblatex}
 \addbibresource{ZTree.bib}
 
-\title{Work in Progress: A Novel Range-Queryable Distributed Data Structure}
+\title{Enabling Sybil Resistant P2P Range Queries Through Application of Blockchain-Based Consensus}
 \author{Charles Noyes \\ cnoyes@usc.edu}
 \date{\vspace{-5ex}}
 
@@ -38,7 +38,7 @@
 \maketitle
 
 \begin{abstract}
-We present the design of a novel data structure. We aim to solve the issue of window/range-based queries of distributed data stores in peer to peer architectures. Traditional models, for example, distributed hash tables (DHTs), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this even key distribution inherently erases all characteristics of the target data that could be used to classify it. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting key space is not uniformly distributed, so we define a distributed consensus protocol in which participants in our network agree to target highly populated regions of the key space. This consensus scheme also provides some protection from Sybil attacks, as it is a to hash-based proof of work system. Finally, we define storage, lookup, and deletion operations that utilize balanced search trees to efficiently perform necessary network functions. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture.
+We present the design of a novel data structure. We aim to solve the issue of window/range-based queries of distributed data stores in peer to peer architectures. Traditional models, for example, distributed hash tables (DHTs), are hostile towards window queries because their hashing operations are designed to uniformly distribute stored data across a defined key space; the hashing operations used to achieve this even key distribution inherently erase all characteristics of the target data that could be used to classify it. We solve this problem of erasure by defining a scheme in which higher-order data is mapped to a first-dimensional key space, while preserving locality. The resulting key space is not uniformly distributed, so we define a distributed consensus protocol in which participants in our network agree to target highly populated regions of the key space, through deterministic redistribution. This consensus scheme also provides some protection from Sybil attacks, as it is a to hash-based proof of work system. Finally, we define storage, lookup, and deletion operations that efficiently perform necessary network functions. A peer to peer communication system acts as the underlying network for participants, providing all of the traditional benefits of a P2P architecture.
 \end{abstract}
 
 
@@ -69,11 +69,11 @@ The idea of locality vs. evenness is fundamental to our work, and so we define i
 and garden variety hash functions obviously do not fulfill this requirement.
 
 \section{Related Work}
-\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries~\cite{Ramabhadran:2004tr,Desnoyers:2008uo}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in most decentralized networks~\cite{Douceur:2002jr}, with a litany of papers having been published on this attack in the context of DHTs~\cite{LesniewskiLass:2010ue}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in peer to peer networks.
+\par Some research has been done on the usage of a DHT as an overlay on top of a traditional data structure to enable range queries~\cite{Ramabhadran:2004tr,Desnoyers:2008uo}, however none of the currently proposed solutions are useful in a true P2P network. Sybil attacks are arguably the most severe vulnerability in decentralized networks~\cite{Douceur:2002jr}, with a litany of papers having been published on this attack in the context of DHTs~\cite{LesniewskiLass:2010ue}, and yet the subject is not even broached. To summarize the cited papers, Sybil attacks are executed through the undermining or subversion of reputation or voting systems through the forging of a identities in P2P networks.
 
 \par Given that if we replace the cryptographic hash function in a DHT with a locality sensitive function~\footnote{Locality sensitive hash functions (LSHs) do exist, however we believe that a lower level function, such as a generic space filling curve, would be better suited for our purposes. LSHs are generally useful only in an extremely narrow set of cases.}, the distribution of keys along the key space will not be even, and so we must design a scheme by which nodes can coalesce onto the more populated areas. This is a necessity because of load balancing concerns in the context of the possibility of the defined Sybil attacks.
 
-\par The Squid~\cite{Schmidt:2003cd}, another tangentially related project, has actually tried to define protocols for more generalized searching (e.g. range and keyword queries), in much the same way that we will. The similarities end in the applicability of their work to situations that are not just distributed in a peer to peer network, but truly decentralized. The differences between the two are slight but of paramount importance, both ideologically and practically, to the applicability of a protocol that satisfies only the first.
+\par The Squid project~\cite{Schmidt:2003cd}, another tangentially related work, has actually tried to define protocols for more generalized searching (e.g. range and keyword queries), in much the same way that we will. The similarities end in the applicability of their work to situations that are not just distributed in a peer to peer network, but truly decentralized. The differences between the two are slight but of paramount importance, both ideologically and practically, to the applicability of a protocol that satisfies only the first.
 
 \par A DHT that satisfies all of these requirements would be extremely helpful to users in a variety of settings. To be clear, no other data structure in existence has these capabilities. In fact, this work is the direct result of an inability to find an existing solution. Some potential applications include:
 
@@ -173,7 +173,7 @@ ZOrd(int((lat + 90) * 100), int((lon + 180) * 100))
 SerializedData = [PrivK_{j}((H(Data)), Data, PubK_{j}]
 \end{equation}
 
-\par When the nodes in a network wish to reconfigure themselves, all nodes are instructed to report all of the proof of work they know about. All of the nodes then independently construct a curve of the key space population and attempt to converge on this region. Given that there will always be a global maxima, this is relatively trivial. The actual methodology of this convergence is the core focus of our ongoing research. Currently, we are exploring the possibility of using the derivative of the fitted curve to calculate optimal node spacing.
+\par When the nodes in a network wish to reconfigure themselves, all nodes are instructed to report all of the proof of work they know about. All of the nodes then independently construct a curve of the key space population and attempt to converge on this region. Given that there will always be a global maxima, this is relatively trivial. The actual methodology of this convergence is the core focus of our ongoing research.
 
 \par From a game theory perspective, the proof of work system is greatly beneficial. Sybil attacks are largely mitigated, and there is no obvious advantage for a malicious node to withhold its knowledge of the proofs in its region. It does, however, introduce some amount of overheard into the network. We believe that this is not a terribly inhibiting factor, as the use cases for a decentralized (i.e. public) version of our data structure are almost always either altruistic or capitalistic in nature. To give an example of the former, folding@Home~\cite{Anderson:2002vr}, a network in which people donate unused computational resources to fold proteins, has been wildly successful. Bitcoin~\cite{Nakamoto:2008ti}, the decentralized P2P cryptocurrency network, is an excellent example of hashing power being used for the latter case. In both networks, there is no lack of available resources.
 
@@ -183,7 +183,7 @@ SerializedData = [PrivK_{j}((H(Data)), Data, PubK_{j}]
 \subsection{Sybil Attacks on The DHT Proper}
 \par Some of the claims made thus far are provable only in the abstract. For example, we assert that Sybil attacks are mitigated through a proof of work system and that this work is not a growth inhibiting factor. Our proof of work system is a basic one, modeled on the HashCash~\cite{Back:2002vq} system. We define a 'proof' as being the value resulting of the inputting of both information and a random number to a hash function. If this proof meets the threshold of difficulty set by the network, it is accepted as valid. To show this, we assume that for a hash function of k bits, the set of possible results is exactly $\{0,1\}^{[k]}$. The odds of any $k'th$ bit being $0$ or $1$ are exactly even (in this case, $1:1$). Thus, the odds of the first $n$ bits being set to 0 is exactly $\frac{1}{2^n}$. Note that simply using $0$-prefixing as the method of work determination is simplistic, and 'better' schemes (like that of Bitcoin, which uses full hex values) can provide finer control. 
 
-\par When applied to our data structure, we would be using the number of votes as our difficulty determining factor. The difficulty should be proportionate to the number of votes and dependant on some predefined ratio of necessary goodness (generally this will be $ > 50\%$, as a result of the Byzantine general problem's theoretical limits in the general case\cite{Lamport:1982fr}). Mathematically,
+\par When applied to our data structure, we would be using the number of votes as our difficulty determining factor. The difficulty should be proportionate to the number of votes and dependant on some predefined ratio of necessary goodness (generally this will be $ > 50\%$, as a result of the Byzantine generals problem's limits in the general case). Mathematically,
 \begin{multline}
 N = \textrm{population size} \\
 m = \textrm{proportion of wanted goodness} \\
@@ -245,7 +245,15 @@ z = \myceil{log_2{ (\frac{2^n}{\frac{N}{m}})}}, q = 2^z \\
 \par For networks that are to be used only in the short term, are large but run on devices without much computational power, or that would benefit more from a lower barrier to entry than would be allowed for with linear scaling of the hashing requirements, our scheme works best. Many autonomous networks fit this set of criteria, and for those that don't, a system where the required work is not dependant on the present work can be used. Perhaps a hybrid system, for example one in which the requisite work does not scale perfectly with the theoretical amount of work required for a Sybil attack overcoming $m$, or perhaps one in which there is a 'schedule' that the network tries to follow and which the amount of work required depends on the deviation from that schedule (more work puts us ahead of schedule, so we increase in the difficulty and vice versa) ala Bitcoin. There are really an endless number of possibilities, and our approach is presented here because no other scheme presents a viable scaled difficulty model.
 
 
-\subsection{}
+\subsection{Active Node Rearrangement}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{plots/histogram}
+\caption{Caption}
+\label{fig:my_label}
+\end{figure}
 \section{Conclusions}
 \par The end game, at least in our eyes, is a working decentralized sensornet (a sensornet being a distributed network of autonomous sensors) using our novel data structure as the method of communication. This could be anything from a disease reporting network to a climate monitoring service. Before beginning this research, we identified a need for a distributed data structure that would work under these conditions, allow for range-based querying, and be resistant to Sybil-like attacks. We are confident that this proposal presents the best avenue forwards in this space.
 
